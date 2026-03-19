@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0a0a0a">
+<title>Python → AI Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#0a0a0a;color:#c8c0b0;font-family:'DM Mono',monospace;min-height:100vh;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+body{padding-bottom:80px}
+
+.hdr{position:sticky;top:0;z-index:100;background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 16px 14px}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,5.5vw,36px);letter-spacing:3px;line-height:1;color:#f0ece3}
+.hdr-sub{font-size:10px;color:#555;margin-top:5px;letter-spacing:2px}
+.hdr-pct{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,7vw,46px);line-height:1;text-align:right;transition:color .3s}
+.hdr-done{font-size:10px;color:#555;letter-spacing:1px;text-align:right;margin-top:3px}
+.progress-bar{margin-top:12px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#e63946,#f4a261);border-radius:2px;transition:width .4s ease}
+.filters{display:flex;gap:8px;margin-top:12px}
+.filter-btn{padding:4px 12px;border-radius:2px;border:1px solid #2a2a2a;background:transparent;color:#555;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.filter-btn.active{background:#f0ece3;color:#0a0a0a;border-color:#f0ece3}
+
+.content{max-width:720px;margin:0 auto;padding:16px 12px}
+
+.block{margin-bottom:2px;border:1px solid #1a1a1a}
+.block-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none;background:#0a0a0a;transition:background .15s}
+.block-hdr.open{background:#0f0f0f}
+.block-hdr:active{background:#111}
+.block-left{display:flex;align-items:center;gap:12px;overflow:hidden}
+.block-tag{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:2px;flex-shrink:0}
+.block-name{font-size:12px;color:#c8c0b0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.block-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:8px}
+.block-count{font-size:10px;color:#555;letter-spacing:.5px;white-space:nowrap}
+.mini-bar{width:44px;height:2px;background:#1a1a1a;border-radius:1px;flex-shrink:0}
+.mini-fill{height:100%;border-radius:1px;transition:width .3s}
+.chevron{font-size:9px;color:#333;transition:transform .2s;flex-shrink:0}
+.chevron.open{transform:rotate(180deg)}
+
+.items{padding:4px 0 10px}
+.item{display:flex;align-items:flex-start;gap:10px;padding:9px 14px;cursor:pointer;transition:background .1s}
+.item:active{background:#111}
+.checkbox{margin-top:2px;width:14px;height:14px;flex-shrink:0;border:1.5px solid #2a2a2a;border-radius:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.checkbox.checked{border-color:currentColor}
+.item-num{font-size:9px;color:#333;min-width:18px;margin-top:3px;letter-spacing:.5px;flex-shrink:0}
+.item-text{font-size:12px;line-height:1.6;color:#c8c0b0;transition:color .15s}
+.item-text.done{color:#282828;text-decoration:line-through}
+
+.footer{margin-top:32px;padding:18px 14px;border:1px solid #1a1a1a;border-left:3px solid #333}
+.footer-label{font-size:10px;color:#555;letter-spacing:1.5px;margin-bottom:10px}
+.footer-line{font-size:11.5px;color:#444;line-height:2.1}
+.footer-warn{color:#e63946;font-size:11px;margin-top:10px}
+
+.tip{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #1a1a1a;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;z-index:200;font-size:11px;color:#555}
+.tip b{color:#c8c0b0}
+.tip-close{background:none;border:none;color:#444;font-size:20px;cursor:pointer;line-height:1;padding:0 2px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">PYTHON → AI ENGINEER</div>
+      <div class="hdr-sub">147 LANDMARKS · FAST TRACK</div>
+    </div>
+    <div>
+      <div class="hdr-pct" id="pct" style="color:#e63946">0%</div>
+      <div class="hdr-done" id="donelabel">0 / 147 DONE</div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="pfill" style="width:0%"></div></div>
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
+    <button class="filter-btn" onclick="setFilter('pending',this)">PENDING</button>
+    <button class="filter-btn" onclick="setFilter('done',this)">DONE</button>
+  </div>
+</div>
+
+<div class="content" id="app"></div>
+
+<div class="tip" id="tip">
+  <span>📌 <b>Add to Home Screen</b> → Chrome menu → "Add to Home screen"</span>
+  <button class="tip-close" onclick="this.parentElement.style.display='none'">×</button>
+</div>
+
+<script>
+const B=[
+ {id:"b1",t:"BLOCK 1",s:"Syntax Foundation",c:"#e63946",items:[
+  "Variables, data types (int, float, str, bool, NoneType)",
+  "Type casting — int(), str(), float(), bool()",
+  "String slicing — s[start:stop:step]",
+  "String methods — .split(), .join(), .strip(), .replace(), .find()",
+  "f-strings and .format()",
+  "if / elif / else",
+  "Ternary operator — x if condition else y",
+  "for loop with range()",
+  "while loop",
+  "break, continue, pass",
+  "enumerate() — loop with index",
+  "zip() — loop over multiple lists",
+  "Nested loops"
+ ]},
+ {id:"b2",t:"BLOCK 2",s:"Data Structures",c:"#f4a261",items:[
+  "Lists — creation, indexing, slicing",
+  "List methods — .append(), .pop(), .insert(), .remove(), .sort(), .reverse()",
+  "List comprehensions — [x**2 for x in range(10)]",
+  "Nested list comprehensions",
+  "Tuples — immutability, when to use vs list",
+  "Tuple packing and unpacking — a, b, c = (1, 2, 3)",
+  "Dictionaries — creation, access, .get()",
+  "Dict methods — .keys(), .values(), .items(), .update()",
+  "Dict comprehensions — {k: v for k, v in pairs}",
+  "Nested dictionaries",
+  "Sets — unique values, .add(), .remove()",
+  "Set operations — union |, intersection &, difference -",
+  "Choosing the right data structure (performance intuition)"
+ ]},
+ {id:"b3",t:"BLOCK 3",s:"Functions — Deep",c:"#2a9d8f",items:[
+  "Defining functions — def, return",
+  "Default parameter values",
+  "*args — variable positional arguments",
+  "**kwargs — variable keyword arguments",
+  "Combining *args and **kwargs",
+  "Lambda functions — lambda x: x*2",
+  "Local vs global scope",
+  "nonlocal keyword",
+  "Returning multiple values (tuple unpacking)",
+  "Functions as first-class objects — passing functions",
+  "Nested functions",
+  "Closures — function that remembers enclosing scope",
+  "Recursion — base case, recursive case"
+ ]},
+ {id:"b4",t:"BLOCK 4",s:"Object Oriented Programming",c:"#457b9d",items:[
+  "Classes and objects — class MyClass:",
+  "__init__ constructor and self",
+  "Instance attributes vs class attributes",
+  "Instance methods",
+  "__repr__ and __str__ dunder methods",
+  "Inheritance — class Child(Parent):",
+  "super() — calling parent methods",
+  "Method overriding",
+  "Multiple inheritance",
+  "@staticmethod — no self, no cls",
+  "@classmethod — cls instead of self",
+  "@property — getter/setter pattern",
+  "Dunder/magic methods — __len__, __getitem__, __call__",
+  "Abstract classes with abc module",
+  "Dataclasses — @dataclass decorator"
+ ]},
+ {id:"b5",t:"BLOCK 5",s:"Functional & Pythonic Style",c:"#6d597a",items:[
+  "map() — apply function to iterable",
+  "filter() — filter iterable by condition",
+  "functools.reduce() — accumulate to single value",
+  "sorted() with key= argument",
+  "Iterators — __iter__, __next__",
+  "Generators — yield keyword",
+  "Generator expressions — (x for x in range(10))",
+  "Why generators matter — memory efficiency for large data",
+  "Decorators — @decorator pattern",
+  "Writing your own decorator",
+  "functools.wraps",
+  "Chaining decorators",
+  "Unpacking operators — * and ** in calls",
+  "Walrus operator := (Python 3.8+)",
+  "Type hints — def func(x: int) -> str:"
+ ]},
+ {id:"b6",t:"BLOCK 6",s:"File Handling & Data I/O",c:"#e76f51",items:[
+  "open(), read(), write(), close()",
+  "with statement — context manager",
+  "Reading line by line",
+  "Writing and appending modes",
+  "json module — json.load(), json.dump()",
+  "csv module — csv.reader(), csv.DictReader()",
+  "pickle module — serializing Python objects",
+  "pathlib.Path — modern file path handling",
+  "os module — os.path, os.listdir(), os.makedirs()",
+  "glob module — pattern matching files",
+  "shutil — copying, moving files"
+ ]},
+ {id:"b7",t:"BLOCK 7",s:"Error Handling",c:"#bc6c25",items:[
+  "try / except block",
+  "Catching specific exceptions — ValueError, TypeError, KeyError",
+  "except Exception as e — getting the error message",
+  "else clause in try/except",
+  "finally clause — always runs",
+  "Raising exceptions — raise ValueError('msg')",
+  "Custom exception classes",
+  "assert statements",
+  "Common exceptions: IndexError, AttributeError, FileNotFoundError, ImportError"
+ ]},
+ {id:"b8",t:"BLOCK 8",s:"Modules, Packages & Environment",c:"#606c38",items:[
+  "import, from x import y, import x as y",
+  "__name__ == '__main__' pattern",
+  "Writing your own module (.py file)",
+  "Writing a package with __init__.py",
+  "Relative imports",
+  "venv — creating virtual environments",
+  "pip — installing packages",
+  "requirements.txt — pip freeze > requirements.txt",
+  "Understanding sys.path",
+  "importlib — dynamic imports",
+  "Standard library: collections, itertools, functools, math, random, time, datetime, re"
+ ]},
+ {id:"b9",t:"BLOCK 9",s:"Regex & String Processing",c:"#0077b6",items:[
+  "re.match(), re.search(), re.findall()",
+  "re.sub() — search and replace",
+  "re.compile() — precompile pattern",
+  "Character classes — \\d, \\w, \\s, \\b",
+  "Quantifiers — *, +, ?, {n,m}",
+  "Groups — (pattern)",
+  "Flags — re.IGNORECASE, re.MULTILINE",
+  "Named groups — (?P<n>pattern)",
+  "Lookahead and lookbehind"
+ ]},
+ {id:"b10",t:"BLOCK 10",s:"NumPy — The Core of ML",c:"#e63946",items:[
+  "np.array() — creating arrays from lists",
+  "Array dtypes — float32, int64, etc.",
+  "Array shapes — .shape, .ndim, .size",
+  "Reshaping — .reshape(), .flatten(), .ravel()",
+  "Indexing and slicing — arr[0], arr[:, 1], arr[1:3, 2:4]",
+  "Boolean indexing — arr[arr > 5]",
+  "Fancy indexing — arr[[0, 2, 4]]",
+  "Broadcasting rules — how shapes align",
+  "Vectorized operations — NO for loops",
+  "Element-wise ops — +, -, *, /, **",
+  "np.dot() — dot product / matrix multiply",
+  "np.matmul() and @ operator",
+  "Axis argument — np.sum(arr, axis=0)",
+  "np.mean(), np.std(), np.var(), np.median()",
+  "np.max(), np.min(), np.argmax(), np.argmin()",
+  "np.zeros(), np.ones(), np.eye(), np.full()",
+  "np.linspace(), np.arange()",
+  "np.random.rand(), np.random.randn(), np.random.seed()",
+  "np.random.choice(), np.random.shuffle()",
+  "Stacking — np.vstack(), np.hstack(), np.concatenate()",
+  "Splitting — np.split(), np.vsplit()",
+  "np.where() — conditional selection",
+  "np.unique(), np.sort(), np.argsort()",
+  "np.clip() — bound values",
+  "np.linalg — norm, det, inv, eig, svd",
+  "Saving/loading — np.save(), np.load()"
+ ]},
+ {id:"b11",t:"BLOCK 11",s:"Pandas — Data Engineering",c:"#f4a261",items:[
+  "pd.DataFrame() and pd.Series()",
+  "pd.read_csv(), pd.read_json(), pd.read_excel()",
+  ".head(), .tail(), .info(), .describe(), .shape",
+  "Selecting columns — df['col'], df[['col1','col2']]",
+  "Selecting rows — df.loc[], df.iloc[]",
+  "Boolean filtering — df[df['age'] > 25]",
+  "Multiple conditions — & and | operators",
+  "Adding/removing columns",
+  "Renaming — .rename()",
+  "Handling nulls — .isnull(), .dropna(), .fillna()",
+  "Duplicate handling — .duplicated(), .drop_duplicates()",
+  "Value counts — .value_counts()",
+  "Sorting — .sort_values()",
+  "Groupby — .groupby().mean(), .agg()",
+  ".apply() — apply function to rows/cols",
+  ".map() — element-wise mapping",
+  "Merging — pd.merge(), .join()",
+  "Concatenating — pd.concat()",
+  "Pivot tables — .pivot_table()",
+  "String operations — .str.lower(), .str.contains()",
+  "Date handling — pd.to_datetime(), .dt accessor",
+  "One-hot encoding — pd.get_dummies()",
+  "Converting dtypes — .astype()",
+  "Saving — .to_csv(), .to_json()"
+ ]},
+ {id:"b12",t:"BLOCK 12",s:"Matplotlib & Visualization",c:"#2a9d8f",items:[
+  "plt.plot() — line chart",
+  "plt.scatter() — scatter plot",
+  "plt.bar(), plt.barh() — bar charts",
+  "plt.hist() — histogram",
+  "plt.imshow() — showing images (critical for CV)",
+  "plt.figure(), plt.subplot(), plt.subplots()",
+  "Labels — plt.xlabel(), plt.ylabel(), plt.title()",
+  "plt.legend()",
+  "plt.tight_layout()",
+  "Saving — plt.savefig()",
+  "Seaborn — sns.heatmap() (confusion matrices)",
+  "sns.pairplot() — feature relationships",
+  "sns.distplot() / sns.histplot()",
+  "Plotting training curves — loss vs epochs"
+ ]},
+ {id:"b13",t:"BLOCK 13",s:"Advanced Python for ML Code",c:"#457b9d",items:[
+  "Context managers — __enter__, __exit__",
+  "Writing custom context managers with contextlib",
+  "collections.defaultdict",
+  "collections.Counter",
+  "collections.OrderedDict",
+  "collections.namedtuple",
+  "itertools.chain(), islice(), product(), combinations()",
+  "functools.lru_cache() — memoization",
+  "functools.partial() — partial functions",
+  "Shallow vs deep copy — copy.copy() vs copy.deepcopy()",
+  "Memory management basics — references, garbage collection",
+  "Profiling — cProfile, timeit",
+  "Multiprocessing — multiprocessing.Pool",
+  "Threading — threading.Thread",
+  "concurrent.futures — ThreadPoolExecutor, ProcessPoolExecutor",
+  "__slots__ — memory optimization in classes"
+ ]},
+ {id:"b14",t:"BLOCK 14",s:"ML-Specific Python Patterns",c:"#6d597a",items:[
+  "Writing a custom Dataset class (PyTorch pattern)",
+  "Writing a custom DataLoader / iterator",
+  "Config management with dataclasses or dicts",
+  "Argument parsing — argparse for scripts",
+  "Logging — logging module (not print!)",
+  "Writing reusable pipelines — function chaining",
+  "Saving and loading models — pickle, joblib",
+  "Environment variables — os.environ, python-dotenv",
+  "Reproducibility — setting seeds across numpy/random/torch",
+  "Timing code — time.time(), contextlib.timer",
+  "Writing clean experiment scripts",
+  "Using __all__ in modules",
+  "Monkey patching (you'll see this in ML libs)"
+ ]},
+ {id:"b15",t:"BLOCK 15",s:"Python for MLOps & Deployment",c:"#e76f51",items:[
+  "Virtual environments and dependency pinning",
+  "Writing proper __main__ blocks for scripts",
+  "sys.argv — command line arguments",
+  "subprocess module — running shell commands from Python",
+  "HTTP requests — requests library",
+  "FastAPI basics — @app.get, @app.post, Pydantic models",
+  "Async Python — async def, await, asyncio",
+  "Pydantic — data validation with type hints",
+  "Environment configs — dev vs prod separation",
+  "Dockerfile basics for Python apps",
+  "Writing unit tests — unittest or pytest basics",
+  "Mocking — unittest.mock"
+ ]}
+];
+
+const TOTAL=B.reduce((s,b)=>s+b.items.length,0);
+let checked={},expanded={b1:true},filter='all';
+
+function load(){try{const d=localStorage.getItem('pyroad');if(d)checked=JSON.parse(d);}catch(e){}}
+function save(){try{localStorage.setItem('pyroad',JSON.stringify(checked));}catch(e){}}
+
+function updateHeader(){
+  const done=Object.values(checked).filter(Boolean).length;
+  const pct=Math.round(done/TOTAL*100);
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('pct').style.color=pct===100?'#2a9d8f':'#e63946';
+  document.getElementById('donelabel').textContent=done+' / '+TOTAL+' DONE';
+  document.getElementById('pfill').style.width=pct+'%';
+}
+
+function setFilter(f,btn){
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleBlock(id){
+  expanded[id]=!expanded[id];
+  const hdr=document.querySelector(`[data-block="${id}"] .block-hdr`);
+  const chev=document.querySelector(`[data-block="${id}"] .chevron`);
+  const itemsEl=document.querySelector(`[data-block="${id}"] .items`);
+  if(expanded[id]){
+    hdr.classList.add('open');chev.classList.add('open');
+    if(!itemsEl){renderItems(id);}else{itemsEl.style.display='';}
+  } else {
+    hdr.classList.remove('open');chev.classList.remove('open');
+    if(itemsEl) itemsEl.style.display='none';
+  }
+}
+
+function renderItems(blockId){
+  const block=B.find(b=>b.id===blockId);
+  const blockEl=document.querySelector(`[data-block="${blockId}"]`);
+  const div=document.createElement('div');
+  div.className='items';
+  block.items.forEach((item,i)=>{
+    const key=`${block.id}-${i}`;
+    if(filter==='done'&&!checked[key])return;
+    if(filter==='pending'&&checked[key])return;
+    const isDone=checked[key];
+    const row=document.createElement('div');
+    row.className='item';row.dataset.key=key;
+    row.onclick=()=>toggleItem(key);
+    row.innerHTML=`
+      <div class="checkbox ${isDone?'checked':''}" style="${isDone?`background:${block.c};border-color:${block.c}`:`border-color:#2a2a2a`}">
+        <svg width="8" height="6" viewBox="0 0 8 6" fill="none" style="display:${isDone?'block':'none'}">
+          <path d="M1 3L3 5L7 1" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="item-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="item-text ${isDone?'done':''}">${item}</span>`;
+    div.appendChild(row);
+  });
+  blockEl.appendChild(div);
+}
+
+function toggleItem(key){
+  checked[key]=!checked[key];
+  save();updateHeader();
+  const row=document.querySelector(`[data-key="${key}"]`);
+  if(!row)return;
+  const blockId=key.split('-').slice(0,-1).join('-');
+  const block=B.find(b=>b.id===blockId);
+  const cb=row.querySelector('.checkbox');
+  const txt=row.querySelector('.item-text');
+  const svg=row.querySelector('svg');
+  if(checked[key]){
+    cb.classList.add('checked');cb.style.background=block.c;cb.style.borderColor=block.c;
+    txt.classList.add('done');if(svg)svg.style.display='block';
+  } else {
+    cb.classList.remove('checked');cb.style.background='';cb.style.borderColor='#2a2a2a';
+    txt.classList.remove('done');if(svg)svg.style.display='none';
+  }
+  const done=block.items.filter((_,i)=>checked[`${block.id}-${i}`]).length;
+  const pct=Math.round(done/block.items.length*100);
+  const mf=document.querySelector(`[data-block="${blockId}"] .mini-fill`);
+  const bc=document.querySelector(`[data-block="${blockId}"] .block-count`);
+  if(mf)mf.style.width=pct+'%';
+  if(bc)bc.textContent=done+'/'+block.items.length;
+  if(filter!=='all'){
+    row.style.opacity='0';row.style.transition='opacity .2s';
+    setTimeout(()=>{row.remove();},200);
+  }
+}
+
+function render(){
+  const app=document.getElementById('app');
+  app.innerHTML='';
+  B.forEach(block=>{
+    const done=block.items.filter((_,i)=>checked[`${block.id}-${i}`]).length;
+    const total=block.items.length;
+    const pct=Math.round(done/total*100);
+    const isOpen=expanded[block.id];
+    if(filter!=='all'){
+      const vis=block.items.filter((_,i)=>{
+        const k=`${block.id}-${i}`;
+        return filter==='done'?checked[k]:!checked[k];
+      });
+      if(vis.length===0)return;
+    }
+    const div=document.createElement('div');
+    div.className='block';div.dataset.block=block.id;
+    div.style.borderLeftColor=block.c;
+    div.innerHTML=`
+      <div class="block-hdr ${isOpen?'open':''}" onclick="toggleBlock('${block.id}')">
+        <div class="block-left">
+          <span class="block-tag" style="color:${block.c}">${block.t}</span>
+          <span class="block-name">${block.s}</span>
+        </div>
+        <div class="block-right">
+          <span class="block-count">${done}/${total}</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${block.c}"></div></div>
+          <span class="chevron ${isOpen?'open':''}">▼</span>
+        </div>
+      </div>`;
+    app.appendChild(div);
+    if(isOpen) renderItems(block.id);
+  });
+
+  const footer=document.createElement('div');
+  footer.className='footer';
+  footer.innerHTML=`
+    <div class="footer-label">AFTER THIS →</div>
+    <div class="footer-line">
+      NumPy done? → Start Andrew Ng ML Course<br>
+      Pandas done? → Build a real data project<br>
+      All 15 blocks? → Jump into PyTorch + Scikit-learn
+    </div>
+    <div class="footer-warn">Don't finish Python before starting ML. Learn both together.</div>`;
+  app.appendChild(footer);
+  updateHeader();
+}
+
+load();render();
+</script>
+</body>
+</html>
